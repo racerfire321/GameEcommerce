@@ -1,6 +1,7 @@
 import { Category } from '@/models/category';
 import sanityClient from './sanity';
-import { Game } from '@/models/game';
+import { Game, GameSubset } from '@/models/game';
+import axios from 'axios';
 
 export const revalidate = 360
 export const getCategories = async (): Promise<Category[]> => {
@@ -113,3 +114,83 @@ export const getCategory = async (slug: string): Promise<Category> => {
 
 	return category;
 };
+
+export const updateGameQuantity = async (games: GameSubset[]) => {
+	const mutation = {
+		mutations: games.map(({ _id, maxQuantity, quantity }) => {
+			return {
+				patch: {
+					id: _id,
+					set: {
+						quantity: maxQuantity - quantity,
+					},
+				},
+			};
+		}),
+	};
+
+	const { data } = await axios.post(
+		`https://${process.env.NEXT_PUBLIC_Sanity_project_id}.api.sanity.io/v2021-06-07/data/mutate/${process.env.NEXT_PUBLIC_Sanity_dataset}`,
+		mutation,
+		{ headers: { Authorization: `Bearer ${process.env.SANITY_TOKEN}` } }
+	);
+
+	return data;
+};
+
+export const createOrder = async (games: GameSubset[], userEmail: string) => {
+	const mutation = {
+		mutations: [
+			{
+				create: {
+					_type: 'order',
+					items: games.map((game, idx) => ({
+						game: {
+							_key: idx,
+							_type: 'reference',
+							_ref: game._id,
+						},
+						quantity: game.quantity,
+					})),
+					userEmail,
+					orderStatus: 'pending',
+				},
+			},
+		],
+	};
+
+	const { data } = await axios.post(
+		`https://${process.env.NEXT_PUBLIC_Sanity_project_id}.api.sanity.io/v2021-06-07/data/mutate/${process.env.NEXT_PUBLIC_Sanity_dataset}`,
+		mutation,
+		{ headers: { Authorization: `Bearer ${process.env.SANITY_TOKEN}` } }
+	);
+
+	return data;
+};
+
+export async function fetchOrder(userEmail: string) {
+	const query = `*[_type == "order" && userEmail == $userEmail] {
+    _id,
+    items[] {
+      _key,
+      quantity,
+      game -> {
+        _id,
+        name,
+        price,
+        images,
+        slug {
+          current
+        },
+        description
+      }
+    },
+    orderStatus,
+    createdAt
+  }`;
+
+	const params = { userEmail };
+	const result: any = await sanityClient.fetch({ query, params });
+
+	return result;
+}

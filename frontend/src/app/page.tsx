@@ -40,7 +40,8 @@ export default async function HomePage(){
 
       {isFeaturedGame && (
         <>
-          <h3 className="font-semibold text-2xl max-w-3xl text-center mx-auto text-primary-dark pt-12 sm:pt-28 pb-8 sm:pb-16 leading-[125%] sm:leading-[187%]">
+        <div className=" justify-center items-center mx-2">
+          <h3 className="font-semibold text-2xl max-w-3xl text-center mx-auto text-primary-dark pt-12 sm:pt-28 pb-8 sm:pb-16 leading-[125%] sm:leading-[187%] justify-center items-center">
             Featured Game
           </h3>
 
@@ -63,6 +64,7 @@ export default async function HomePage(){
               </Link>
             </div>
           </section>
+          </div>
         </>
       )}
 
@@ -178,8 +180,8 @@ const sectionClassName = {
 
 
 const featuredClassNames = {
-  gameName: "font-bold text-2xl md:text-3xl lg:text-4xl mb-4 md:mb-8",
-  gameDetails: "max-w-screen-md text-sm mb-8 md:mb-12",
+  gameName: " transition-colors duration-300 hover:text-orange-700 font-bold text-2xl md:text-3xl lg:text-4xl mb-4 md:mb-8 justify-center items-center",
+  gameDetails: " text-sm mb-8 md:mb-12 justify-center items-center",
   gameImage: "h-72 md:h-96 lg:h-112 w-full object-cover rounded-lg",
 };
 const styles = {
@@ -194,7 +196,7 @@ const styles = {
 
 const recentGamesClasses = {
   section: "py-16 lg:py-36 px-4 lg:px-36 text-white text-center",
-  heading: "text-3xl lg:text-4xl font-bold mb-3",
+  heading: " transition-colors duration-300 hover:text-orange-700text-3xl lg:text-4xl font-bold mb-3",
   subHeading: "text-gray-400 max-w-xl mx-auto lg:text-lg",
 };
 // const categories = [
